@@ -140,6 +140,9 @@ npm run db:push
 | `/setup` | `verification` | Mengirim panel verifikasi interaktif dengan tombol `[✅ Verifikasi]` | Administrator |
 | `/setup` | `autorole` | Mengatur role otomatis saat member baru join | Administrator |
 | `/setup` | `welcome` | Mengatur channel dan format pesan sambutan member | Administrator |
+| `/setup` | `ticket` | Mengirim panel tiket bantuan interaktif dengan tombol `[📩 Buka Tiket]` | Administrator |
+| `/rank` | - | Menampilkan kartu peringkat, level, XP, dan progress bar visual | Semua Member |
+| `/leaderboard` | - | Menampilkan papan peringkat 10 member teraktif di server | Semua Member |
 
 ---
 

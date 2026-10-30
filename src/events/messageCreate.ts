@@ -2,6 +2,7 @@ import { Message } from "discord.js";
 import { BotEvent } from "../types/index.js";
 import { UltimateClient } from "../client/UltimateClient.js";
 import { AutoModService } from "../services/automod.service.js";
+import { LevelingService } from "../services/leveling.service.js";
 import { db } from "../database/index.js";
 
 export const messageCreateEvent: BotEvent<"messageCreate"> = {
@@ -13,7 +14,10 @@ export const messageCreateEvent: BotEvent<"messageCreate"> = {
     const violated = await AutoModService.inspectMessage(client, message);
     if (violated) return; // Jika melanggar, pesan sudah dihapus, berhenti di sini
 
-    // 2. Cek Auto-Responder / Custom Triggers
+    // 2. Berikan XP jika pesan valid (Leveling System)
+    await LevelingService.handleMessageXp(client, message);
+
+    // 3. Cek Auto-Responder / Custom Triggers
     try {
       const autoResponders = await db.autoResponder.findMany({
         where: { guildId: message.guild.id },

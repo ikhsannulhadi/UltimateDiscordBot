@@ -1,4 +1,12 @@
-import { Interaction } from "discord.js";
+import {
+  Interaction,
+  ChannelType,
+  PermissionFlagsBits,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  TextChannel,
+} from "discord.js";
 import { BotEvent } from "../types/index.js";
 import { UltimateClient } from "../client/UltimateClient.js";
 import { logger } from "../utils/logger.js";
@@ -79,6 +87,117 @@ export const interactionCreateEvent: BotEvent<"interactionCreate"> = {
             ephemeral: true,
           });
         }
+        return;
+      }
+
+      // BUAT TIKET BARU
+      if (interaction.customId === "btn_create_ticket") {
+        if (!interaction.guild) return;
+
+        const config = await client.getGuildConfig(interaction.guild.id);
+        const categoryId = config.ticketCategoryId;
+
+        // Cek apakah channel tiket untuk user ini sudah ada
+        const sanitizedUsername = interaction.user.username.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const channelName = `ticket-${sanitizedUsername}`;
+
+        const existingChannel = interaction.guild.channels.cache.find(
+          (c) => c.name === channelName
+        );
+
+        if (existingChannel) {
+          await interaction.reply({
+            content: `⚠️ Kamu sudah memiliki tiket yang aktif di <#${existingChannel.id}>. Selesaikan tiket tersebut terlebih dahulu.`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        try {
+          const ticketChannel = await interaction.guild.channels.create({
+            name: channelName,
+            type: ChannelType.GuildText,
+            parent: categoryId || undefined,
+            permissionOverwrites: [
+              {
+                id: interaction.guild.id, // @everyone
+                deny: [PermissionFlagsBits.ViewChannel],
+              },
+              {
+                id: interaction.user.id,
+                allow: [
+                  PermissionFlagsBits.ViewChannel,
+                  PermissionFlagsBits.SendMessages,
+                  PermissionFlagsBits.AttachFiles,
+                  PermissionFlagsBits.ReadMessageHistory,
+                ],
+              },
+              {
+                id: client.user!.id,
+                allow: [
+                  PermissionFlagsBits.ViewChannel,
+                  PermissionFlagsBits.SendMessages,
+                  PermissionFlagsBits.ManageChannels,
+                ],
+              },
+            ],
+          });
+
+          // Tombol Tutup Tiket
+          const closeButton = new ButtonBuilder()
+            .setCustomId("btn_close_ticket")
+            .setLabel("Tutup Tiket")
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji("🔒");
+
+          const row = new ActionRowBuilder<ButtonBuilder>().addComponents(closeButton);
+
+          const embed = createEmbed({
+            title: `🎫 Tiket Dukungan: ${interaction.user.username}`,
+            description:
+              `Halo ${interaction.user}, terima kasih telah menghubungi tim dukungan.\n\n` +
+              `Silakan jelaskan pertanyaan atau masalah kamu secara rinci di sini. Staf kami akan segera merespons.\n\n` +
+              `*Jika masalah sudah selesai, klik tombol **Tutup Tiket** di bawah.*`,
+            color: Colors.Primary,
+          });
+
+          await ticketChannel.send({
+            content: `${interaction.user} Selamat datang di tiket bantuanmu!`,
+            embeds: [embed],
+            components: [row],
+          });
+
+          await interaction.reply({
+            content: `✅ Tiket bantuan kamu berhasil dibuat di <#${ticketChannel.id}>!`,
+            ephemeral: true,
+          });
+        } catch (err) {
+          logger.error("Gagal membuat channel tiket:", err);
+          await interaction.reply({
+            content: "❌ Gagal membuat channel tiket. Pastikan bot memiliki permission Manage Channels.",
+            ephemeral: true,
+          });
+        }
+        return;
+      }
+
+      // TUTUP TIKET
+      if (interaction.customId === "btn_close_ticket") {
+        const channel = interaction.channel as TextChannel;
+        if (!channel) return;
+
+        await interaction.reply({
+          content: "🔒 **Tiket ini akan ditutup dan dihapus dalam 5 detik...**",
+        });
+
+        setTimeout(async () => {
+          try {
+            await channel.delete("Tiket ditutup");
+          } catch (err) {
+            logger.error("Gagal menghapus channel tiket:", err);
+          }
+        }, 5000);
+        return;
       }
     }
   },

@@ -68,6 +68,25 @@ export const setupCommand: Command = {
             .setDescription("Aktifkan fitur welcome message")
             .setRequired(false)
         )
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName("ticket")
+        .setDescription("Kirim panel pembuatan tiket bantuan ke channel yang dipilih")
+        .addChannelOption((opt) =>
+          opt
+            .setName("channel")
+            .setDescription("Channel tempat panel tiket akan diletakkan")
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
+        )
+        .addChannelOption((opt) =>
+          opt
+            .setName("category")
+            .setDescription("Kategori tempat channel tiket baru akan dibuat")
+            .addChannelTypes(ChannelType.GuildCategory)
+            .setRequired(true)
+        )
     ),
 
   async execute(interaction, client) {
@@ -183,6 +202,47 @@ export const setupCommand: Command = {
             color: Colors.Success,
           }),
         ],
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // 4. SUBCOMMAND: TICKET
+    if (sub === "ticket") {
+      const channel = interaction.options.getChannel("channel", true) as TextChannel;
+      const category = interaction.options.getChannel("category", true);
+
+      await db.guildConfig.upsert({
+        where: { guildId },
+        update: { ticketCategoryId: category.id },
+        create: {
+          guildId,
+          ticketCategoryId: category.id,
+        },
+      });
+
+      client.invalidateGuildCache(guildId);
+
+      const embed = createEmbed({
+        title: "📩 Pusat Bantuan & Tiket Server",
+        description:
+          `Butuh bantuan dari tim moderator / staf?\n\n` +
+          `Klik tombol **Buka Tiket** di bawah ini untuk membuat channel percakapan privat dengan staf kami.`,
+        color: Colors.Primary,
+      });
+
+      const button = new ButtonBuilder()
+        .setCustomId("btn_create_ticket")
+        .setLabel("Buka Tiket Support")
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji("📩");
+
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
+
+      await channel.send({ embeds: [embed], components: [row] });
+
+      await interaction.reply({
+        content: `✅ Panel tiket berhasil dikirim ke <#${channel.id}> dengan kategori tiket: **${category.name}**!`,
         ephemeral: true,
       });
       return;

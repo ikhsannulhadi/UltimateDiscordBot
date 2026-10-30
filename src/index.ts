@@ -10,6 +10,8 @@ import { warnCommand } from "./commands/moderation/warn.js";
 import { clearCommand } from "./commands/moderation/clear.js";
 import { timeoutCommand } from "./commands/moderation/timeout.js";
 import { setupCommand } from "./commands/utility/setup.js";
+import { rankCommand } from "./commands/gamification/rank.js";
+import { leaderboardCommand } from "./commands/gamification/leaderboard.js";
 
 // Import Events
 import { readyEvent } from "./events/ready.js";
@@ -31,6 +33,8 @@ async function bootstrap() {
     clearCommand,
     timeoutCommand,
     setupCommand,
+    rankCommand,
+    leaderboardCommand,
   ];
 
   for (const cmd of commands) {
