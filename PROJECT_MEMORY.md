@@ -79,4 +79,7 @@ Dokumen ini adalah **single source of truth** untuk mencatat visi, arsitektur, k
       * `/clear`: bulk delete pesan (1-100 pesan).
       * `/timeout`: mute member dengan custom durasi menit.
   * **Build & Startup Test**: TypeScript kompilasi sukses (`npm run build`), startup boot berhasil terverifikasi.
+  * **Dokumentasi Publik & Open Source**:
+    * Membuat `README.md` berstandar GitHub lengkap dengan badging, fitur unggulan, tabel slash commands, panduan setup `.env`, gateway intents, dan SQLite GUI via Prisma Studio.
+    * Menambahkan lisensi MIT (`LICENSE`).
 * **2026-10-30 (Inisialisasi Proyek)**: Inisialisasi memori proyek, perumusan pilar fitur lengkap (Auto-mod lokal tanpa AI, Mod, Automation, Gamifikasi), serta penetapan prinsip arsitektur Dashboard-Ready.
