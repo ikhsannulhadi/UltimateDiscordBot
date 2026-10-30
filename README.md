@@ -61,7 +61,6 @@ UltimateDiscordBot/
 │   ├── utils/              # Helper embeds, logger, dan tools
 │   └── index.ts            # Entry point aplikasi
 ├── .env.example            # Template konfigurasi environment
-├── PROJECT_MEMORY.md       # Dokumentasi memori & roadmap internal proyek
 ├── package.json
 └── tsconfig.json
 ```
