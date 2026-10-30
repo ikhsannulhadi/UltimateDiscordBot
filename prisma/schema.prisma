@@ -1,0 +1,92 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Konfigurasi Server Utama
+model GuildConfig {
+  guildId           String   @id
+  prefix            String   @default("!")
+  modLogChannelId   String?
+  welcomeChannelId  String?
+  welcomeMessage    String?  @default("Selamat datang {user} di {server}!")
+  welcomeEnabled    Boolean  @default(false)
+  autoRoleId        String?
+  verifyRoleId      String?
+  ticketCategoryId  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  autoMod           AutoModConfig?
+  warnings          Warning[]
+  userLevels        UserLevel[]
+  autoResponders    AutoResponder[]
+}
+
+// Pengaturan Auto-Mod per Server (100% Rule-Based & Cepat)
+model AutoModConfig {
+  guildId             String   @id
+  antiSpamEnabled     Boolean  @default(false)
+  spamMaxMessages     Int      @default(5)     // Max pesan
+  spamIntervalSeconds Int      @default(3)     // Dalam rentang detik
+
+  antiInviteEnabled   Boolean  @default(false)
+  antiLinkEnabled     Boolean  @default(false)
+  antiCapsEnabled     Boolean  @default(false)
+  capsThresholdPercent Int     @default(70)    // % huruf kapital minimum
+
+  antiMassMention     Boolean  @default(false)
+  mentionThreshold    Int      @default(5)
+
+  badWordsEnabled     Boolean  @default(false)
+  badWordsList        String   @default("")    // Comma-separated atau JSON array string
+
+  // Auto-escalation: hukuman otomatis saat mencapai akumulasi warning
+  escalateWarnings    Int      @default(3)     // Jumlah warn
+  escalateAction      String   @default("TIMEOUT") // TIMEOUT, KICK, BAN
+  escalateDurationMins Int     @default(10)
+
+  guild               GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+}
+
+// Log Pelanggaran Member
+model Warning {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  userId    String
+  moderatorId String
+  reason    String
+  createdAt DateTime @default(now())
+
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+}
+
+// Sistem XP & Leveling
+model UserLevel {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  userId    String
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  lastXpAt  DateTime @default(now())
+
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+}
+
+// Auto-Responder FAQ
+model AutoResponder {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  trigger   String
+  response  String
+  matchExact Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+}
