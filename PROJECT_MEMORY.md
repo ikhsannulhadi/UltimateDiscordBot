@@ -78,7 +78,12 @@ Dokumen ini adalah **single source of truth** untuk mencatat visi, arsitektur, k
       * `/warn`: subcommand `add`, `list`, `clear`.
       * `/clear`: bulk delete pesan (1-100 pesan).
       * `/timeout`: mute member dengan custom durasi menit.
-  * **Build & Startup Test**: TypeScript kompilasi sukses (`npm run build`), startup boot berhasil terverifikasi.
+      * `/setup`: subcommand `verification`, `autorole`, `welcome`.
+  * **Onboarding & Community Automation Engine (Selesai)**:
+    * **Verification Gatekeeper**: Mengirim panel verifikasi interaktif dengan Discord Button (`btn_verify_member`), memberikan role otomatis secara aman dan anti-raid.
+    * **Auto-Role**: Pemberian role instan pada event `guildMemberAdd`.
+    * **Welcome & Goodbye System**: Pengiriman kartu sambutan / perpisahan otomatis di `guildMemberAdd` dan `guildMemberRemove` dengan formatting `{user}`, `{server}`, `{memberCount}`.
+  * **Build & Startup Test**: TypeScript kompilasi sukses (`npm run build`), startup boot berhasil terverifikasi (6 commands, 5 event listeners).
   * **Dokumentasi Publik & Open Source**:
     * Membuat `README.md` berstandar GitHub lengkap dengan badging, fitur unggulan, tabel slash commands, panduan setup `.env`, gateway intents, dan SQLite GUI via Prisma Studio.
     * Menambahkan lisensi MIT (`LICENSE`).

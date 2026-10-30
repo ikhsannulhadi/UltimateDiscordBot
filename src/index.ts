@@ -9,11 +9,14 @@ import { automodCommand } from "./commands/automod/automod.js";
 import { warnCommand } from "./commands/moderation/warn.js";
 import { clearCommand } from "./commands/moderation/clear.js";
 import { timeoutCommand } from "./commands/moderation/timeout.js";
+import { setupCommand } from "./commands/utility/setup.js";
 
 // Import Events
 import { readyEvent } from "./events/ready.js";
 import { messageCreateEvent } from "./events/messageCreate.js";
 import { interactionCreateEvent } from "./events/interactionCreate.js";
+import { guildMemberAddEvent } from "./events/guildMemberAdd.js";
+import { guildMemberRemoveEvent } from "./events/guildMemberRemove.js";
 
 async function bootstrap() {
   validateConfig();
@@ -27,6 +30,7 @@ async function bootstrap() {
     warnCommand,
     clearCommand,
     timeoutCommand,
+    setupCommand,
   ];
 
   for (const cmd of commands) {
@@ -35,7 +39,13 @@ async function bootstrap() {
   logger.info(`Telah memuat ${commands.length} internal command.`);
 
   // 2. Registrasi Events
-  const events: BotEvent[] = [readyEvent, messageCreateEvent, interactionCreateEvent];
+  const events: BotEvent[] = [
+    readyEvent,
+    messageCreateEvent,
+    interactionCreateEvent,
+    guildMemberAddEvent,
+    guildMemberRemoveEvent,
+  ];
 
   for (const event of events) {
     if (event.once) {

@@ -137,6 +137,9 @@ npm run db:push
 | `/warn` | `clear` | Menghapus seluruh riwayat peringatan member | Moderate Members |
 | `/timeout` | - | Memberikan sanksi mute / timeout dengan durasi menit | Moderate Members |
 | `/clear` | - | Menghapus banyak pesan sekaligus (1-100 pesan) | Manage Messages |
+| `/setup` | `verification` | Mengirim panel verifikasi interaktif dengan tombol `[✅ Verifikasi]` | Administrator |
+| `/setup` | `autorole` | Mengatur role otomatis saat member baru join | Administrator |
+| `/setup` | `welcome` | Mengatur channel dan format pesan sambutan member | Administrator |
 
 ---
 
